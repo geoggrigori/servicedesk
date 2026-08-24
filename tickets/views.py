@@ -30,6 +30,7 @@ from tickets.serializers import (
 FINISHED = [Status.RESOLVED, Status.CLOSED, Status.CANCELLED]
 
 
+@extend_schema(tags=["teams"])
 class TeamViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):
     queryset = Team.objects.all()
     serializer_class = TeamSerializer

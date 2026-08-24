@@ -29,6 +29,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "django_filters",
     "drf_spectacular",
+    "drf_spectacular_sidecar",
     "accounts",
     "tickets",
 ]
@@ -126,6 +127,11 @@ SPECTACULAR_SETTINGS = {
     "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": False,
     "COMPONENT_SPLIT_REQUEST": True,
+    # Serve the Swagger UI assets from the app instead of a CDN, so the docs
+    # render offline and the UI version is pinned with the rest of the deps.
+    "SWAGGER_UI_DIST": "SIDECAR",
+    "SWAGGER_UI_FAVICON_HREF": "SIDECAR",
+    "REDOC_DIST": "SIDECAR",
 }
 
 # --- Celery ----------------------------------------------------------------
