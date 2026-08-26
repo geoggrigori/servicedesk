@@ -1,43 +1,66 @@
-# Servicedesk 🎫
+<!-- ══════════════════════════ TÍTULO ══════════════════════════ -->
+<div align="center">
+  <img src="docs/title-banner.svg" width="100%" alt="Servicedesk"/>
+</div>
 
-**English** · [Português](README.pt.md) · [Español](README.es.md)
+<!-- ══════════════════════ IDIOMAS / LANGUAGES ══════════════════════ -->
+<div align="center">
+<a href="README.md"><img src="https://img.shields.io/badge/Português-1987F0?style=for-the-badge" alt="Português"/></a>
+<a href="README.en.md"><img src="https://img.shields.io/badge/English-555555?style=for-the-badge" alt="English"/></a>
+<a href="README.es.md"><img src="https://img.shields.io/badge/Español-555555?style=for-the-badge" alt="Español"/></a>
+</div>
 
-A ticketing backend built around the part most help desk clones skip: **the SLA clock that only ticks during working hours**.
+<h1 align="center">Servicedesk 🎫</h1>
+<p align="center"><em>Backend de tickets construído em torno da parte que a maioria dos clones de helpdesk ignora: o relógio de SLA que só conta durante o horário comercial</em></p>
+<p align="center"><strong>Ticket aberto → prazos em minutos úteis → pausa/retoma → varredura automática de violação → escalonamento</strong></p>
 
-Tickets carry a first response target and a resolution target. Those deadlines are computed in business minutes, so a ticket opened at 5pm on Friday is not already late by Monday morning. When a ticket is parked waiting on the requester, the clock stops. When it runs out anyway, a scheduled job flags the breach and escalates the ticket to the team lead.
+<div align="center">
+<img src="https://img.shields.io/badge/Django_5.2-092E20?style=flat-square&logo=django&logoColor=white" alt="django"/>
+<img src="https://img.shields.io/badge/DRF-A30000?style=flat-square" alt="drf"/>
+<img src="https://img.shields.io/badge/Celery-37814A?style=flat-square&logo=celery&logoColor=white" alt="celery"/>
+<img src="https://img.shields.io/badge/PostgreSQL-4169E1?style=flat-square&logo=postgresql&logoColor=white" alt="postgres"/>
+<img src="https://img.shields.io/badge/License-MIT-2E7D32?style=flat-square" alt="license"/>
+</div>
 
-> Built with Django 5.2, Django REST Framework, Celery and PostgreSQL.
+<div align="center">
+<a href="#o-que-tem-aqui"><img src="https://img.shields.io/badge/▸_O_QUE_TEM_AQUI-1987F0?style=for-the-badge" alt="oquetem"/></a>
+<a href="#quickstart"><img src="https://img.shields.io/badge/▸_QUICKSTART-000000?style=for-the-badge" alt="quickstart"/></a>
+<a href="#como-o-relógio-de-sla-funciona"><img src="https://img.shields.io/badge/▸_RELÓGIO_DE_SLA-1987F0?style=for-the-badge" alt="sla"/></a>
+<a href="#arquitetura"><img src="https://img.shields.io/badge/▸_ARQUITETURA-000000?style=for-the-badge" alt="arquitetura"/></a>
+<a href="#api"><img src="https://img.shields.io/badge/▸_API-1987F0?style=for-the-badge" alt="api"/></a>
+</div>
 
----
+<br/>
 
-## ✨ What is in here
+> ⏱️ **Um ticket aberto às 17h de sexta com meta de 2h vence às 10h de segunda**, não às 19h de sexta. O relógio só conta minutos úteis.
 
-- **Business-hours SLA engine** ([`tickets/sla.py`](tickets/sla.py)) with no dependencies beyond the standard library. Working days, opening hours, holidays and timezones. Pure functions, so the rules are covered by 14 tests on their own.
-- **Guarded status machine** ([`tickets/services.py`](tickets/services.py)). Every move is checked against an explicit transition table, so a cancelled ticket cannot quietly come back to life. Illegal moves answer `409 Conflict` instead of corrupting the record.
-- **A clock that pauses.** Moving a ticket to *Pending requester* stops the resolution timer, and resuming pushes the deadline forward by exactly the working minutes that were lost. Nights and weekends spent waiting cost the requester nothing.
-- **Automatic escalation.** A Celery beat job sweeps for breaches every few minutes, stamps them, raises the escalation level and reassigns the ticket to the team lead. The sweep is idempotent, so running it twice never double counts.
-- **Append-only audit trail.** Creation, status changes, assignments, comments, breaches and escalations all land in `AuditEvent`, written only by the service layer and read-only in the admin.
-- **Role-scoped access.** Requesters see and reply on their own tickets. Agents see their team queues. Internal notes never reach the person who opened the ticket.
-- **Priority repricing.** Raising a ticket from Normal to Urgent recomputes both deadlines under the new policy instead of leaving stale targets behind.
-- **OpenAPI schema** served by drf-spectacular, with Swagger UI on the root URL.
-- **60 tests**, ruff clean, `check --deploy` clean, CI on GitHub Actions.
+<div align="center">
+  <img src="docs/screenshot.png" width="100%" alt="Servicedesk"/>
+</div>
 
----
+## O que tem aqui
 
-## 🚀 Quickstart
+- **Motor de SLA em horário comercial** ([`tickets/sla.py`](tickets/sla.py)) sem dependências além da stdlib. Dias úteis, horário de expediente, feriados e timezones. Funções puras, cobertas por 14 testes só delas.
+- **Máquina de estados protegida** ([`tickets/services.py`](tickets/services.py)). Toda transição é checada contra uma tabela explícita — um ticket cancelado não pode voltar à vida silenciosamente. Movimentos ilegais respondem `409 Conflict` em vez de corromper o registro.
+- **Um relógio que pausa.** Mover um ticket para *Pending requester* para o timer de resolução, e retomar empurra o prazo pra frente exatamente pelos minutos úteis perdidos.
+- **Escalonamento automático.** Um job do Celery beat varre violações a cada poucos minutos, marca, sobe o nível de escalonamento e reatribui o ticket ao líder do time. A varredura é idempotente.
+- **Trilha de auditoria append-only.** Criação, mudanças de status, atribuições, comentários, violações e escalonamentos — tudo em `AuditEvent`, escrito só pela camada de serviço.
+- **Acesso por papel.** Solicitantes veem e respondem só seus próprios tickets. Agentes veem as filas do time. Notas internas nunca chegam a quem abriu o ticket.
+- **Reprecificação de prioridade.** Subir um ticket de Normal pra Urgente recalcula os dois prazos sob a nova política.
+- **Schema OpenAPI** servido por drf-spectacular, com Swagger UI na raiz.
+- **60 testes**, ruff limpo, `check --deploy` limpo, CI no GitHub Actions.
 
-### With Docker
+## Quickstart
 
+**Com Docker:**
 ```bash
 git clone https://github.com/geoggrigori/servicedesk.git
 cd servicedesk
 docker compose up --build
 ```
+Sobe PostgreSQL, Redis, a API, um worker Celery e o beat. Migra e semeia dados de demo. Abra <http://localhost:8000> pra docs da API e <http://localhost:8000/admin/> pro admin — login `admin` / `demo12345`.
 
-That brings up PostgreSQL, Redis, the API, a Celery worker and beat. It migrates and seeds demo data on the way up. Open <http://localhost:8000> for the API docs and <http://localhost:8000/admin/> for the admin, then log in as `admin` / `demo12345`.
-
-### Without Docker
-
+**Sem Docker:**
 ```bash
 python -m venv .venv && source .venv/bin/activate
 pip install -r requirements-dev.txt
@@ -47,118 +70,96 @@ python manage.py migrate
 python manage.py seed_demo
 python manage.py runserver
 ```
+SQLite é o padrão. Aponte `DATABASE_URL` pro Postgres quando quiser.
 
-SQLite is the default, so nothing else needs to be running. Point `DATABASE_URL` at PostgreSQL when you want it.
-
-To watch the SLA sweeper work, run the worker and the scheduler in two more terminals:
-
+Pra ver o sweeper de SLA funcionando, rode o worker e o scheduler em dois terminais:
 ```bash
 celery -A config worker -l info
 celery -A config beat -l info
 ```
 
-Or set `CELERY_TASK_ALWAYS_EAGER=True` and call the task straight from the shell.
+## Como o relógio de SLA funciona
 
----
+Uma política define dois prazos por prioridade, por time, em minutos:
 
-## 🕘 How the SLA clock works
-
-A policy sets two targets per priority, per team, in minutes:
-
-| Priority | First response | Resolution |
+| Prioridade | Primeira resposta | Resolução |
 |---|---|---|
-| Urgent | 15 min | 4 h |
-| High | 1 h | 8 h |
+| Urgente | 15 min | 4 h |
+| Alta | 1 h | 8 h |
 | Normal | 4 h | 24 h |
-| Low | 8 h | 48 h |
+| Baixa | 8 h | 48 h |
 
-Those minutes are **working** minutes. With a Monday to Friday, 09:00 to 18:00 calendar:
+Esses minutos são **úteis**. Com um calendário de segunda a sexta, 09:00–18:00:
+- Um ticket aberto às **17h de sexta** com meta de 2h vence às **10h de segunda**, não às 19h de sexta.
+- Um ticket aberto às **3h da manhã** começa a contar às 09:00.
+- Um feriado listado em `BUSINESS_HOLIDAYS` é pulado como um fim de semana.
+- Tempo em *Pending requester* é devolvido ao prazo, também só em minutos úteis.
 
-- A ticket opened at **17:00 Friday** with a 2 hour target is due at **10:00 Monday**, not 19:00 Friday.
-- A ticket opened at **3am** starts counting at 09:00, because nobody was at the desk.
-- A holiday listed in `BUSINESS_HOLIDAYS` is skipped like a weekend.
-- Time spent in *Pending requester* is added back to the deadline, again in working minutes only.
+Uma política pode desligar isso com `business_hours_only=False` e usar o relógio de parede normal, pra times 24/7.
 
-A policy can opt out with `business_hours_only=False` and fall back to plain wall clock time, which is what a 24/7 team wants.
-
-Teams get their own policies; a policy with no team acts as the global fallback.
-
----
-
-## 🧱 Architecture
+## Arquitetura
 
 ```
-config/          settings, Celery app, beat schedule, URLs
-accounts/        custom user model with admin / agent / requester roles
+config/          settings, app Celery, agenda do beat, URLs
+accounts/        modelo de usuário custom com papéis admin/agente/solicitante
 tickets/
   models.py      Team, SlaPolicy, Ticket, Comment, AuditEvent
-  sla.py         business-hours arithmetic, pure functions
-  services.py    the only place tickets change: state machine + audit
-  tasks.py       the breach sweeper and the escalation job
-  views.py       DRF viewsets, custom actions, SLA report
-tests/           60 tests across the clock, services, tasks and API
+  sla.py         aritmética de horário comercial, funções puras
+  services.py    único lugar que muda tickets: máquina de estados + auditoria
+  tasks.py       o sweeper de violações e o job de escalonamento
+  views.py       viewsets DRF, ações custom, relatório de SLA
 ```
 
-The rule the codebase leans on: **nothing mutates a ticket outside `services.py`**. The API, the admin actions and the Celery jobs all call the same functions, which is why the status machine, the SLA timestamps and the audit trail cannot drift apart.
+A regra que sustenta o código: **nada muda um ticket fora de `services.py`**. API, ações do admin e jobs do Celery chamam as mesmas funções — por isso a máquina de estados, os timestamps de SLA e a trilha de auditoria nunca desalinham.
 
----
+## API
 
-## 🔌 API
-
-Authenticate with JWT:
-
+Autentica com JWT:
 ```bash
 curl -X POST localhost:8000/api/v1/auth/token/ \
   -H 'Content-Type: application/json' \
   -d '{"username": "agent1", "password": "demo12345"}'
 ```
 
-| Method | Endpoint | What it does |
+| Método | Endpoint | O que faz |
 |---|---|---|
-| `GET` | `/api/v1/tickets/` | List, scoped to what the caller may see |
-| `POST` | `/api/v1/tickets/` | Open a ticket, deadlines computed on the spot |
-| `GET` | `/api/v1/tickets/{id}/` | Detail, with comments and full history |
-| `POST` | `/api/v1/tickets/{id}/transition/` | Move status, `409` if the machine forbids it |
-| `POST` | `/api/v1/tickets/{id}/assign/` | Assign to an agent |
-| `POST` | `/api/v1/tickets/{id}/priority/` | Reprice, recomputing both deadlines |
-| `GET` `POST` | `/api/v1/tickets/{id}/comments/` | Read or add a reply, public or internal |
-| `GET` | `/api/v1/reports/sla/` | Queue health counters, agents only |
-| `GET` | `/api/schema/` | OpenAPI 3 schema |
+| `GET` | `/api/v1/tickets/` | Lista, restrita ao que o chamador pode ver |
+| `POST` | `/api/v1/tickets/` | Abre um ticket, prazos calculados na hora |
+| `POST` | `/api/v1/tickets/{id}/transition/` | Move status, `409` se a máquina proibir |
+| `POST` | `/api/v1/tickets/{id}/assign/` | Atribui a um agente |
+| `POST` | `/api/v1/tickets/{id}/priority/` | Reprecifica, recalculando os dois prazos |
+| `GET`/`POST` | `/api/v1/tickets/{id}/comments/` | Lê ou adiciona resposta, pública ou interna |
+| `GET` | `/api/v1/reports/sla/` | Contadores de saúde da fila, só agentes |
+| `GET` | `/api/schema/` | Schema OpenAPI 3 |
 
-Useful filters: `?status=new&status=in_progress`, `?breached=true`, `?unassigned=true`, `?team=infra`, `?assignee=agent1`, `?search=TCK-00042`, `?ordering=-resolution_due_at`.
+Filtros úteis: `?status=new&status=in_progress`, `?breached=true`, `?unassigned=true`, `?team=infra`, `?search=TCK-00042`.
 
----
-
-## 🧪 Tests
+## Testes
 
 ```bash
-pytest              # 60 tests
+pytest              # 60 testes
 ruff check .        # lint
-ruff format --check .
 ```
 
-The suite is deliberately weighted toward the rules rather than the plumbing: the business-hours arithmetic, the transition table, the pause and resume behaviour, what counts as a first response, and the idempotency of the sweeper.
+A suíte é propositalmente concentrada nas regras, não na plumbing: aritmética de horário comercial, tabela de transição, comportamento de pausa/retomada, e a idempotência do sweeper.
 
----
+## Configuração
 
-## ⚙️ Configuration
+Tudo vem do ambiente — veja [`.env.example`](.env.example) pra lista completa.
 
-Everything is read from the environment. See [`.env.example`](.env.example) for the full list.
-
-| Variable | Default | Notes |
+| Variável | Padrão | Nota |
 |---|---|---|
-| `DATABASE_URL` | SQLite file | Any URL django-environ understands |
-| `TIME_ZONE` | `America/Sao_Paulo` | The calendar is evaluated in this zone |
-| `BUSINESS_WORKDAYS` | `0,1,2,3,4` | Monday is 0 |
-| `BUSINESS_START` / `BUSINESS_END` | `09:00` / `18:00` | |
-| `BUSINESS_HOLIDAYS` | empty | ISO dates, comma separated |
-| `SLA_SWEEP_MINUTES` | `5` | How often the sweeper runs |
-| `CELERY_TASK_ALWAYS_EAGER` | `False` | Run tasks inline while developing |
+| `TIME_ZONE` | `America/Sao_Paulo` | Calendário avaliado nesse fuso |
+| `BUSINESS_WORKDAYS` | `0,1,2,3,4` | Segunda é 0 |
+| `BUSINESS_START`/`BUSINESS_END` | `09:00`/`18:00` | |
+| `SLA_SWEEP_MINUTES` | `5` | Frequência do sweeper |
 
-With `DEBUG=False` the app switches on HTTPS redirects, HSTS and secure cookies on its own.
+## Licença
 
----
+[MIT](LICENSE).
 
-## 📄 License
+<div align="center">
+  <img src="https://file.loading.io/color/feature/thumb/Blues-8.png?" width="100%" height="10px" alt="divider"/>
+</div>
 
-MIT. See [LICENSE](LICENSE).
+<p align="center"><sub>Desenvolvido por <strong><a href="https://github.com/geoggrigori">Grigori</a></strong> · 2026</sub></p>
