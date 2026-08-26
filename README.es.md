@@ -10,10 +10,6 @@
 <a href="README.es.md"><img src="https://img.shields.io/badge/Español-1987F0?style=for-the-badge" alt="Español"/></a>
 </div>
 
-<h1 align="center">Servicedesk 🎫</h1>
-<p align="center"><em>Un backend de tickets construido alrededor de la parte que la mayoría de los clones de helpdesk se saltan: el reloj de SLA que solo corre en horario laboral</em></p>
-<p align="center"><strong>Ticket abierto → plazos en minutos hábiles → pausa/reanuda → barrido automático de incumplimiento → escalamiento</strong></p>
-
 <div align="center">
 <img src="https://img.shields.io/badge/Django_5.2-092E20?style=flat-square&logo=django&logoColor=white" alt="django"/>
 <img src="https://img.shields.io/badge/DRF-A30000?style=flat-square" alt="drf"/>
