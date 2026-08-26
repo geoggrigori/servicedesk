@@ -10,10 +10,6 @@
 <a href="README.es.md"><img src="https://img.shields.io/badge/Español-555555?style=for-the-badge" alt="Español"/></a>
 </div>
 
-<h1 align="center">Servicedesk 🎫</h1>
-<p align="center"><em>A ticketing backend built around the part most help desk clones skip: the SLA clock that only ticks during working hours</em></p>
-<p align="center"><strong>Ticket opened → deadlines in working minutes → pause/resume → automatic breach sweep → escalation</strong></p>
-
 <div align="center">
 <img src="https://img.shields.io/badge/Django_5.2-092E20?style=flat-square&logo=django&logoColor=white" alt="django"/>
 <img src="https://img.shields.io/badge/DRF-A30000?style=flat-square" alt="drf"/>
