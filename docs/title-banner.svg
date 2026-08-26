@@ -1,0 +1,12 @@
+<svg width="1200" height="150" viewBox="0 0 1200 150" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Servicedesk">
+  <defs>
+    <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#6B2FB5"/>
+      <stop offset="100%" stop-color="#4A1E86"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="150" fill="url(#g)"/>
+  <text x="600" y="66" text-anchor="middle" font-family="'Poppins','Segoe UI',Helvetica,Arial,sans-serif" font-size="42" font-weight="600" letter-spacing="1" fill="#ffffff">Servicedesk</text>
+  <text x="600" y="108" text-anchor="middle" font-family="'Poppins','Segoe UI',Helvetica,Arial,sans-serif" font-size="15" font-weight="400" letter-spacing="3" fill="#E8D9FA" opacity="0.8">SLA-AWARE TICKETING BACKEND</text>
+  <rect x="0" y="146" width="1200" height="4" fill="#C9A6F7"/>
+</svg>
